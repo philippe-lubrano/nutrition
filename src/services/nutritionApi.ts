@@ -10,7 +10,7 @@ export const analyzeNutrition = async (ingredients: string[]): Promise<any> => {
   }
 
   // Traduire les ingrédients en anglais avant d'appeler l'API
-  const translatedIngredients = await translateIngredients(ingredients);
+  const translatedIngredients = translateIngredients(ingredients);
   
   const url = `https://api.edamam.com/api/nutrition-details?app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_APP_KEY}`;
   

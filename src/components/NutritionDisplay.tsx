@@ -1,5 +1,6 @@
 import React from 'react';
 import { Flame, Zap, Wheat, Beef, Droplet } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import type { EdamamResponse } from '../types/nutrition';
 
 interface NutritionDisplayProps {
@@ -91,10 +92,64 @@ const NutritionDisplay: React.FC<NutritionDisplayProps> = ({ nutritionData, load
     },
   ];
 
-  return (
+  // Préparation des données pour le camembert
+  const pieData = [
+    {
+      name: 'Protéines',
+      value: Math.round(nutritionData.totalNutrients?.PROCNT?.quantity || 0),
+      color: '#2563eb', // bleu
+    },
+    {
+      name: 'Glucides',
+      value: Math.round(nutritionData.totalNutrients?.CHOCDF?.quantity || 0),
+      color: '#d97706', // amber
+    },
+    {
+      name: 'Lipides',
+      value: Math.round(nutritionData.totalNutrients?.FAT?.quantity || 0),
+      color: '#059669', // émeraude
+    },
+  ];
+
+  // Palette pastel améliorée et plus contrastée
+  const pastelColors = ['#7FB3FF', '#FFD6A5', '#B5EAD7'];
+
+  // Total macronutriments
+  const totalMacros = pieData.reduce((sum, d) => sum + d.value, 0);
+
+  const renderCustomLabel = (props) => {
+    const { cx, cy, midAngle = 0, outerRadius, percent, index } = props;
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 24;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const entry = pieData[index];
+    // Ligne de liaison
+    const lineX = cx + (outerRadius + 8) * Math.cos(-midAngle * RADIAN);
+    const lineY = cy + (outerRadius + 8) * Math.sin(-midAngle * RADIAN);
+    return (
+        <g>
+          <polyline
+              points={`${lineX},${lineY} ${x},${y}`}
+              stroke="#bbb"
+              strokeWidth={1.5}
+              fill="none"
+          />
+          <circle cx={x} cy={y} r={18} fill="#fff" filter="url(#shadow)" />
+          <text x={x} y={y} fill="#333" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize="14" fontWeight="bold">
+            {entry.name}
+          </text>
+          <text x={x} y={y + 16} fill="#666" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize="12">
+            {entry.value}g • {(percent * 100).toFixed(0)}%
+          </text>
+        </g>
+    );
+  };
+
+    return (
     <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
       <h3 className="text-xl font-bold text-gray-800 mb-6">Informations nutritionnelles</h3>
-      
+
       {/* Macronutriments principaux */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {macros.map((macro) => {
@@ -135,6 +190,50 @@ const NutritionDisplay: React.FC<NutritionDisplayProps> = ({ nutritionData, load
       {/* Poids total */}
       <div className="mt-6 text-center text-sm text-gray-500">
         Poids total estimé: {Math.round(nutritionData.totalWeight)} g
+      </div>
+
+      {/* Camembert des macronutriments */}
+      <div className="mt-8">
+        <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">Répartition des macronutriments</h4>
+        <div className="flex justify-center">
+          <div>
+            <ResponsiveContainer width={340} height={270}>
+              <PieChart>
+                <defs>
+                  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#bbb" floodOpacity="0.25" />
+                  </filter>
+                </defs>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={85}
+                  innerRadius={56}
+                  labelLine={false}
+                  label={renderCustomLabel}
+                  isAnimationActive={true}
+                  animationDuration={1000}
+                  stroke="#fff"
+                  strokeWidth={2}
+                >
+                  {pieData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={pastelColors[index % pastelColors.length]} />
+                  ))}
+                </Pie>
+                {/* Affichage du total au centre */}
+                <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" fontSize="24" fontWeight="bold" fill="#222">
+                  {totalMacros}g
+                </text>
+                <text x="50%" y="62%" textAnchor="middle" dominantBaseline="middle" fontSize="13" fill="#888">
+                  Total
+                </text>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
     </div>
   );
