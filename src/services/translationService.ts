@@ -1,5 +1,5 @@
 // Service de traduction utilisant LibreTranslate API (gratuite)
-const LIBRE_TRANSLATE_URL = 'https://libretranslate.de/translate';
+const LIBRE_TRANSLATE_URL = 'https://libretranslate.com/translate';
 
 export const translateToEnglish = async (text: string): Promise<string> => {
   try {
