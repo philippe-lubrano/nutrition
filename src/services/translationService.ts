@@ -1,19 +1,14 @@
 // Service de traduction utilisant LibreTranslate API (gratuite)
-const LIBRE_TRANSLATE_URL = 'https://libretranslate.com/translate';
+const LIBRE_TRANSLATE_URL = 'https://655.mtis.workers.dev/translate';
 
 export const translateToEnglish = async (text: string): Promise<string> => {
   try {
-    const response = await fetch(LIBRE_TRANSLATE_URL, {
-      method: 'POST',
+    const url = LIBRE_TRANSLATE_URL + `?source_lang=fr&target_lang=en&text=${text}`
+    const response = await fetch(url, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        q: text,
-        source: 'fr',
-        target: 'en',
-        format: 'text'
-      })
     });
 
     if (!response.ok) {
@@ -21,7 +16,7 @@ export const translateToEnglish = async (text: string): Promise<string> => {
     }
 
     const data = await response.json();
-    return data.translatedText;
+    return data.translated_text;
   } catch (error) {
     console.error('Erreur lors de la traduction:', error);
     // Fallback: retourner le texte original si la traduction échoue
