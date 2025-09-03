@@ -1,10 +1,10 @@
 import { translateIngredients } from './translationService';
 
-const EDAMAM_APP_ID = 'your_app_id_here';
-const EDAMAM_APP_KEY = 'your_app_key_here';
+const EDAMAM_APP_ID = '47379841';
+const EDAMAM_APP_KEY = 'd28718060b8adfd39783ead254df7f92';
 
 export const analyzeNutrition = async (ingredients: string[]): Promise<any> => {
-  if (!EDAMAM_APP_ID || EDAMAM_APP_ID === 'your_app_id_here') {
+  if (!EDAMAM_APP_ID) {
     // Données simulées pour la démo
     return simulateNutritionData(ingredients);
   }
